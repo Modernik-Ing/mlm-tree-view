@@ -1,0 +1,22 @@
+{
+    "name": "modernik/mlm-tree-view",
+    "description": "Une bibliothèque PHP pour générer des arbres MLM (multi-level marketing) avec un rendu HTML stylisé prêt à l'emploi.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Modernik\\MlmTreeView\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Esaie Muhasa",
+            "email": "esaiemuhasa.dev@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
