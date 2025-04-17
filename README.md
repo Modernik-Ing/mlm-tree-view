@@ -71,8 +71,7 @@ Vous pouvez :
 
 ## 🧱 Structure des données attendue
 
-> (À ajouter bientôt)
-```
+> (À ajouter bientôt) 
 
 ---
 
