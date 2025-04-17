@@ -89,7 +89,7 @@ Ce projet est sous licence **MIT** — vous pouvez l’utiliser librement dans v
 
 ## 👤 Auteur
 
-Développé avec ❤️ par [Esaie Muhasa](https://github.com/esaiemuhasa)  
-Pour toute suggestion, amélioration ou bug, n’hésitez pas à créer une *issue* ou une *pull request*.
+Développé avec par [Esaie Muhasa](https://github.com/esaiemuhasa)  
+Pour toute suggestion, amélioration ou bug, n’hésitez pas à créer une *issue* ou un *pull request*.
 
 ---
