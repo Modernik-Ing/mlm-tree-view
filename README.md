@@ -30,25 +30,42 @@ composer require modernik/mlm-tree-view
 
 ```php
 
-use Esaiemuhasa\MlmTreeView\Model\DefaultTreeNode;
-use Esaiemuhasa\MlmTreeView\HTMLTreeRenderer;
+use Modernik\MlmTreeView\GenericTreeNode;
+use Modernik\MlmTreeView\Placement\CenteredTreeLayoutEngine;
+use Modernik\MlmTreeView\Renderer\HtmlTreeRenderer;
 
-$tree = new DefaultTreeNode('Leader', [
-    new DefaultTreeNode('Membre A'),
-    new DefaultTreeNode('Membre B', [
-        new DefaultTreeNode('Membre B1'),
-        new DefaultTreeNode('Membre B2'),
+$ternary = new GenericTreeNode(1, 'ROOT', [
+    new GenericTreeNode(2, 'A', [
+        new GenericTreeNode(3, 'A1'),
+        new GenericTreeNode(4, 'A2'),
+        new GenericTreeNode(5, 'A3'),
     ]),
+    new GenericTreeNode(6, 'B', [
+        new GenericTreeNode(7, 'B1'),
+        new GenericTreeNode(8, 'B2'),
+        new GenericTreeNode(9, 'B3'),
+    ]),
+    new GenericTreeNode(10, 'C', [
+        new GenericTreeNode(11, 'C1'),
+        new GenericTreeNode(12, 'C2'),
+        new GenericTreeNode(13, 'C3'),
+    ])
 ]);
 
-$renderer = new HTMLTreeRenderer();
-echo $renderer->render($tree);
+// Création du renderer
+$layout = new CenteredTreeLayoutEngine();
+$renderer = new HtmlTreeRenderer($layout, true);
+
 ```
+
+### Rendu HTML dans un navigateur
+![MLM, réseau ternaire](./ressources/ternary.png)
 
 ### Avec style embarqué
 
 ```php
-echo $renderer->render($tree, withStyles: true);
+<h1>Réseau binaire</h1>
+<?= $renderer->render($ternary) ?>
 ```
 
 > 💡 Le paramètre `withStyles: true` injecte le CSS directement dans la page. Pratique pour un rendu rapide sans configuration.
