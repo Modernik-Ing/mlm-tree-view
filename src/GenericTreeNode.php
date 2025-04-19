@@ -15,12 +15,12 @@ class GenericTreeNode implements TreeNode
     protected array $tags = [];
     protected ?string $link = null;
 
-    public function __construct(string|int $id, string $name, ?TreeNode $parent = null, array $children = [], array $tags = [], ?string $link = null)
+    public function __construct(string|int $id, string $name, array $children = [], ?TreeNode $parent = null, array $tags = [], ?string $link = null)
     {
         $this->Id = $id;
         $this->name = $name;
-        $this->parent = $parent;
         $this->children = $children;
+        $this->parent = $parent;
         $this->tags = $tags;
         $this->link = $link;
 

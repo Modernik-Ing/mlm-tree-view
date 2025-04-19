@@ -7,29 +7,67 @@ use Modernik\MlmTreeView\Renderer\HtmlTreeRenderer;
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 // Construction manuelle de l’arbre
-$root = new GenericTreeNode(1, 'CEO', null, [
-    new GenericTreeNode(2, 'Manager A', null, [
-        new GenericTreeNode(5, 'Agent A1'),
-        new GenericTreeNode(5, 'Agent A2'),
+$root = new GenericTreeNode(1, 'CEO', [
+    new GenericTreeNode(2, 'Manager A', [
+        new GenericTreeNode(3, 'Agent A1'),
+        new GenericTreeNode(4, 'Agent A2'),
         new GenericTreeNode(5, 'Agent A3'),
     ]),
-    new GenericTreeNode(3, 'Manager B', null, [
-            new GenericTreeNode(5, 'Agent B1'),
-            new GenericTreeNode(5, 'Agent B2'),
+    new GenericTreeNode(6, 'Manager B', [
+            new GenericTreeNode(7, 'Agent B1'),
+            new GenericTreeNode(8, 'Agent B2'),
     ]),
-    new GenericTreeNode(4, 'Manager C'),
-    new GenericTreeNode(4, 'Manager D'),
-    new GenericTreeNode(4, 'Manager E'),
-    new GenericTreeNode(4, 'Manager F'),
+    new GenericTreeNode(9, 'Manager C'),
+    new GenericTreeNode(10, 'Manager D'),
+    new GenericTreeNode(11, 'Manager E')
+]);
+
+$binary = new GenericTreeNode(1, 'ROOT', [
+    new GenericTreeNode(2, 'A', [
+        new GenericTreeNode(3, 'A1'),
+        new GenericTreeNode(4, 'A2', [
+                new GenericTreeNode(8, 'A21'),
+                new GenericTreeNode(9, 'A22', [
+                        new GenericTreeNode(10, 'A221'),
+                        new GenericTreeNode(11, 'A222'),
+                ]),
+        ]),
+    ]),
+    new GenericTreeNode(5, 'B', [
+        new GenericTreeNode(6, 'B1', [
+                new GenericTreeNode(12, 'B11', [
+                        new GenericTreeNode(13, 'B111', [
+                                new GenericTreeNode(14, 'B1111'),
+                                new GenericTreeNode(14, 'B1112')
+                        ])
+                ]),
+        ]),
+        new GenericTreeNode(7, 'B2'),
+    ])
+]);
+
+$ternary = new GenericTreeNode(1, 'ROOT', [
+    new GenericTreeNode(2, 'A', [
+        new GenericTreeNode(3, 'A1'),
+        new GenericTreeNode(4, 'A2'),
+        new GenericTreeNode(5, 'A3'),
+    ]),
+    new GenericTreeNode(6, 'B', [
+        new GenericTreeNode(7, 'B1'),
+        new GenericTreeNode(8, 'B2'),
+        new GenericTreeNode(9, 'B3'),
+    ]),
+    new GenericTreeNode(10, 'C', [
+        new GenericTreeNode(11, 'C1'),
+        new GenericTreeNode(12, 'C2'),
+        new GenericTreeNode(13, 'C3'),
+    ])
 ]);
 
 
 // Création du renderer
 $layout = new CenteredTreeLayoutEngine();
 $renderer = new HtmlTreeRenderer($layout, true);
-
-// Rendu HTML
-$html = $renderer->render($root);
 
 ?>
 <!DOCTYPE html>
@@ -50,8 +88,13 @@ $html = $renderer->render($root);
 <body>
 
 <h1>Démo de l’Arbre MLM</h1>
+<?= $renderer->render($root) ?>
 
-<?= $html ?>
+<h1>Réseau binaire</h1>
+<?= $renderer->render($binary) ?>
+
+<h1>Réseau ternaire</h1>
+<?= $renderer->render($ternary) ?>
 
 </body>
 </html>
