@@ -5,15 +5,10 @@ namespace Modernik\MlmTreeView\Placement;
 use Modernik\MlmTreeView\TreeNode;
 
 /**
- * Représente un nœud d'arbre positionné avec des coordonnées explicites.
+ * Représente un nœud positionné dans l'arbre, avec ses coordonnées et ses dimensions.
  *
- * Cette structure est utilisée après le calcul de placement
- * pour le rendu graphique ou HTML d'un arbre hiérarchique.
- * Elle encapsule le nœud logique d'origine (`TreeNode`) ainsi que ses
- * coordonnées (`x`, `y`) dans un plan bidimensionnel, en plus de ses enfants
- * positionnés récursivement.
- *
- * @package Modernik\MlmTreeView\Placement
+ * Contient une référence au nœud source, sa boîte englobante calculée (bound),
+ * et ses enfants positionnés récursivement.
  */
 class PositionedTreeNode
 {
@@ -25,25 +20,27 @@ class PositionedTreeNode
     public TreeNode $node;
 
     /**
-     * Position horizontale calculée du nœud.
-     *
-     * Peut être exprimée en pixels ou en unités logiques selon l’usage.
-     *
-     * @var int|float
-     */
-    public int|float $x;
-
-    /**
-     * Position verticale calculée du nœud (généralement selon la profondeur).
-     *
-     * @var int|float
-     */
-    public int|float $y;
-
-    /**
      * Liste des enfants positionnés de manière récursive.
      *
      * @var PositionedTreeNode[]
      */
     public array $children = [];
+
+    /**
+     * Boîte englobante du nœud positionné, incluant sa position et ses dimensions.
+     */
+    public ?Bound $bound = null;
+
+    /**
+     * Retourne les styles CSS nécessaires pour positionner le nœud dans une interface HTML.
+     *
+     * @return string Exemple : "left:100px;top:50px;width:120px;height:60px;"
+     */
+    public function boundToCss () : string
+    {
+        if ($this->bound === null) {
+            return "";
+        }
+        return $this->bound->toCss();
+    }
 }

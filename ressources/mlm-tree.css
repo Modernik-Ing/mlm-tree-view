@@ -1,0 +1,30 @@
+.dark .mlm-tree-view-container {
+    background-color: #121212;
+}
+
+.mlm-tree-view-container,
+.mlm-tree-node {
+    box-sizing: border-box;
+}
+
+.mlm-tree-view-container {
+    position: relative;
+    border: 2px solid #202020;
+    border-radius: 5px;
+}
+
+.mlm-tree-node {
+    position: absolute;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding-top: 20px;
+    font-weight: bold;
+}
+
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+
+}

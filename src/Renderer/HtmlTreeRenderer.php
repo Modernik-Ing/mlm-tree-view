@@ -46,6 +46,7 @@ class HtmlTreeRenderer implements TreeRenderer
     public function render(TreeNode $node): string
     {
         $positioned = $this->layoutEngine->layout($node);
+        $bound = $this->layoutEngine->getBound();
         $nodesHtml = '';
         $connections = [];
 
@@ -62,51 +63,40 @@ class HtmlTreeRenderer implements TreeRenderer
 
         $html = '';
         if ($this->withStyles) {
-            $html .= '<style>' . file_get_contents(dirname(__DIR__, 2) .DIRECTORY_SEPARATOR. "ressources".DIRECTORY_SEPARATOR."mlm-tree.css") . '</style>';
+            $css = file_get_contents(dirname(__DIR__, 2) .DIRECTORY_SEPARATOR. "ressources".DIRECTORY_SEPARATOR."mlm-tree.css");
+            // Supprimer les retours à la ligne, tabulations et espaces multiples
+            $css = preg_replace('/\s+/', ' ', $css); // remplace tous les espaces blancs consécutifs par un seul espace
+            $css = preg_replace('/\s*([{}:;,])\s*/', '$1', $css); // supprime les espaces autour des caractères CSS
+            $css = trim($css); // supprime les espaces de début et fin
+            $html .= '<style>' . $css . '</style>';
         }
 
-        $html .= '<div class="mlm-tree-view-container" style="position: relative;">';
-        $html .= $this->renderNode($positioned);
+        $size = "width: {$bound->width}px;height: {$bound->height}px;";
+
+        $html .= '<div class="mlm-tree-view-container" style="position: relative;'.$size.'">';
+        $html .= "$svg $nodesHtml";
         $html .= '</div>';
 
-        return '<div class="mlm-tree-view-container" style="position: relative;">' . $svg . $nodesHtml . '</div>';;
+        return $html;
     }
 
     /**
      * Rend un nœud positionné (et ses enfants) sous forme de blocs HTML.
      *
      * @param PositionedTreeNode $node Le nœud positionné à rendre.
-     * @return string Le HTML correspondant au nœud et à ses descendants.
+     * @param string $html
+     * @param array $connections
+     * @return void
      */
-    private function renderNode(PositionedTreeNode $node): string
-    {
-        $x = $node->x;
-        $y = $node->y;
-
-        $style = "left: {$x}px; top: {$y}px;";
-
-        $html = '<div class="mlm-tree-node" style="position: absolute; ' . $style . '">';
-        $html .= '<div class="mlm-tree-node-content">';
-        $html .= htmlspecialchars($node->node->getName());
-        $html .= '</div>';
-        $html .= '</div>';
-
-        foreach ($node->children as $child) {
-            $html .= $this->renderNode($child);
-        }
-
-        return $html;
-    }
-
     private function renderNodeWithConnections(PositionedTreeNode $node, string &$html, array &$connections): void
     {
-        $x = $node->x;
-        $y = $node->y;
+        $x = $node->bound->x;
+        $y = $node->bound->y;
 
-        $width = 120;
-        $height = 60;
+        $width = $node->bound->width;
+        $height = $node->bound->height;
 
-        $html .= '<div class="mlm-tree-node" style="position: absolute; left: ' . $x . 'px; top: ' . $y . 'px;">';
+        $html .= '<div class="mlm-tree-node" style="position: absolute; ' . $node->boundToCss() . ';">';
         $html .= '<div class="mlm-tree-node-content">';
         $html .= htmlspecialchars($node->node->getName());
         $html .= '</div>';
@@ -117,8 +107,8 @@ class HtmlTreeRenderer implements TreeRenderer
             $x1 = $x + $width / 2;
             $y1 = $y + $height;
 
-            $x2 = $child->x + $width / 2;
-            $y2 = $child->y;
+            $x2 = $child->bound->x + $width / 2;
+            $y2 = $child->bound->y;
 
             $connections[] = [$x1, $y1, $x2, $y2];
 

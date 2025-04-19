@@ -20,4 +20,11 @@ interface TreeLayoutEngine
      * @return PositionedTreeNode L'arbre enrichi de coordonnées de placement
      */
     public function layout(TreeNode $root): PositionedTreeNode;
+
+
+    /**
+     * Taille de l'espace de travail
+     * @return Bound
+     */
+    public function getBound() : Bound;
 }
