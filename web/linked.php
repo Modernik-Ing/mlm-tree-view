@@ -1,20 +1,29 @@
 <?php
 
-use Modernik\MlmTreeView\GenericTreeNode;
+use Modernik\MlmTreeView\LinkGenerator;
 use Modernik\MlmTreeView\Placement\CenteredTreeLayoutEngine;
-use Modernik\MlmTreeView\Renderer\BasicHtmlTreeRenderer;
+use Modernik\MlmTreeView\Renderer\LinkedHtmlTreeRenderer;
+use Modernik\MlmTreeView\TreeNode;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-include("fake-data.php");
 
+include("fake-data.php");
 global $root;
 global $binary;
 global $ternary;
 
+class BasicLinkGenerator implements LinkGenerator
+{
+    public function generate(TreeNode $node): ?string
+    {
+        return "/linked.php?id={$node->getId()}";
+    }
+}
+
 
 // Création du renderer
-$layout = new CenteredTreeLayoutEngine(70, 60, 50, 80);
-$renderer = new BasicHtmlTreeRenderer($layout, true);
+$layout = new CenteredTreeLayoutEngine();
+$renderer = new LinkedHtmlTreeRenderer($layout, new BasicLinkGenerator(), true);
 
 ?>
 <!DOCTYPE html>
@@ -34,13 +43,12 @@ $renderer = new BasicHtmlTreeRenderer($layout, true);
 </head>
 <body>
 
-<h1>Démo de l’Arbre MLM</h1>
-<?= $renderer->render($root) ?>
+<?php echo isset($_GET["id"])? "<h1>id = {$_GET['id']}</h1>":""?>
 
-<h1>Réseau binaire</h1>
+<h1>Réseau binaire Avec des Liens</h1>
 <?= $renderer->render($binary) ?>
 
-<h1>Réseau ternaire</h1>
+<h1>Réseau ternaire avec des liens</h1>
 <?= $renderer->render($ternary) ?>
 
 </body>
