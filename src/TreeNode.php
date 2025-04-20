@@ -26,13 +26,6 @@ interface TreeNode
     public function getName(): string;
 
     /**
-     * Renvoie l'URL permettant de charger la page contiens la description des enfants du lien.
-     * Tres utile pour les arbres qui sont chargés en moitié par exemple.
-     * @return string|null
-     */
-    public function getLink(): string | null;
-
-    /**
      * Retourne les enfants directs du nœud actuel.
      *
      * @return TreeNode[] Un tableau de nœuds enfants

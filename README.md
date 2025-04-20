@@ -32,7 +32,7 @@ composer require modernik/mlm-tree-view
 
 use Modernik\MlmTreeView\GenericTreeNode;
 use Modernik\MlmTreeView\Placement\CenteredTreeLayoutEngine;
-use Modernik\MlmTreeView\Renderer\HtmlTreeRenderer;
+use Modernik\MlmTreeView\Renderer\BasicHtmlTreeRenderer;
 
 $ternary = new GenericTreeNode(1, 'ROOT', [
     new GenericTreeNode(2, 'A', [
@@ -54,7 +54,7 @@ $ternary = new GenericTreeNode(1, 'ROOT', [
 
 // Création du renderer
 $layout = new CenteredTreeLayoutEngine();
-$renderer = new HtmlTreeRenderer($layout, true);
+$renderer = new BasicHtmlTreeRenderer($layout, true);
 
 ```
 
