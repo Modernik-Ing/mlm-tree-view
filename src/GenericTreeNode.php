@@ -13,16 +13,14 @@ class GenericTreeNode implements TreeNode
     protected ?TreeNode $parent;
     protected array $children = [];
     protected array $tags = [];
-    protected ?string $link = null;
 
-    public function __construct(string|int $id, string $name, array $children = [], ?TreeNode $parent = null, array $tags = [], ?string $link = null)
+    public function __construct(string|int $id, string $name, array $children = [], ?TreeNode $parent = null, array $tags = [])
     {
         $this->Id = $id;
         $this->name = $name;
         $this->children = $children;
         $this->parent = $parent;
         $this->tags = $tags;
-        $this->link = $link;
 
         foreach ($children as $child) {
             $child->setParent($this);
@@ -74,16 +72,4 @@ class GenericTreeNode implements TreeNode
         return $this;
     }
 
-    public function getLink(): string|null
-    {
-        return $this->link;
-    }
-
-    /**
-     * @param string|null $link
-     */
-    public function setLink(?string $link): void
-    {
-        $this->link = $link;
-    }
 }

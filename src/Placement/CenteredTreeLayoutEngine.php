@@ -28,8 +28,8 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
     public function layout (TreeNode $root): PositionedTreeNode
     {
         $measured = $this->measure($root);
-        $this->bound = new Bound(0, 0, $measured->width, $this->getTreeDepth($root) * ($this->nodeHeight + $this->spaceY));
-        return $this->doLayout($measured, -$this->spaceX, 0);
+        $this->bound = new Bound(0, 0, $measured->width + ($this->spaceX * 2), $this->getTreeDepth($root) * ($this->nodeHeight + $this->spaceY));
+        return $this->doLayout($measured, 0, 0);
     }
 
     public function getBound(): Bound
@@ -73,7 +73,7 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
     private function doLayout(MeasuredNode $measuredNode, float $xOffset, int $depth): PositionedTreeNode
     {
         $x = $xOffset + ($measuredNode->width / 2);
-        $y = $depth * ($this->nodeHeight + $this->spaceY);
+        $y = ($depth * ($this->nodeHeight + $this->spaceY)) + $this->spaceY / 2;
 
         $positioned = new PositionedTreeNode();
         $positioned->node = $measuredNode->node;
