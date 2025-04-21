@@ -89,32 +89,9 @@ abstract class AbstractHtmlRenderer implements TreeRenderer
         $positioned = $this->layoutEngine->layout($node);
         $bound = $this->layoutEngine->getBound();
         $nodesHtml = '';
-        $connections = [];
 
-        $this->renderNodeWithConnections($positioned, $nodesHtml, $connections);
-
-        // Générer le SVG des lignes
         $svg = '<svg class="mlm-tree-svg" xmlns="http://www.w3.org/2000/svg" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;">';
-
-        //foreach ($connections as [$x1, $y1, $x2, $y2]) {
-        //    $svg .= "<line x1=\"$x1\" y1=\"$y1\" x2=\"$x2\" y2=\"$y2\" stroke=\"#555\" stroke-width=\"2\" />";
-        //}
-
-        $index = 0;
-        foreach ($connections as [$x1, $y1, $x2, $y2, $depth]) {
-            $curveOffset = $this->calculateCurveOffset($depth);
-
-            $cx1 = $x1;
-            $cy1 = $y1 + $curveOffset;
-
-            $cx2 = $x2;
-            $cy2 = $y2 - $curveOffset;
-
-            $delay = 0.05 * $index;
-            $svg .= "<path d=\"M$x1,$y1 C$cx1,$cy1 $cx2,$cy2 $x2,$y2\" stroke=\"#555\" stroke-width=\"2\" fill=\"none\" style=\"animation-delay: {$delay}s\" />";
-            $index++;
-        }
-
+        $this->renderNodeWithConnections($positioned, $nodesHtml, $svg);
         $svg .= '</svg>';
 
         $html = '';
@@ -131,11 +108,19 @@ abstract class AbstractHtmlRenderer implements TreeRenderer
         return $html;
     }
 
+    /**
+     * Calcule le décalage de courbure (offset) à appliquer à une liaison courbe entre deux nœuds d'un arbre, en fonction de leur profondeur.
+     * Ce décalage est utilisé pour générer des courbes SVG plus prononcées à faible profondeur, et plus resserrées à mesure que la profondeur augmente.
+     * La formule utilise une décroissance exponentielle pour atténuer la courbure en fonction de la profondeur, tout en imposant une valeur minimale.
+     *
+     * @param int $depth La profondeur du nœud dans l'arbre (0 = racine).
+     * @return float Le décalage de courbe à appliquer (au minimum 20).
+     */
     private function calculateCurveOffset(int $depth): float
     {
-        $base = 60;
-        $decay = 0.35;
-        $min = 20;
+        $base = 60;         // Offset maximal à la racine (profondeur 0)
+        $decay = 0.35;      // Facteur de décroissance exponentielle
+        $min = 20;          // Offset minimal pour éviter des courbes trop plates
         $offset = $base * exp(-$decay * $depth);
         return max($offset, $min);
     }
@@ -143,31 +128,53 @@ abstract class AbstractHtmlRenderer implements TreeRenderer
     /**
      * Rend récursivement chaque nœud positionné, et prépare les coordonnées des connexions.
      *
-     * @param PositionedTreeNode $node        Le nœud positionné courant.
-     * @param string             $html        Le HTML cumulé de tous les nœuds.
-     * @param array              $connections Liste des connexions à tracer au format [x1, y1, x2, y2].
+     * @param PositionedTreeNode $node Le nœud positionné courant.
+     * @param string             $html Le HTML cumulé de tous les nœuds.
+     * @param string              $svg Correction des noeuds, en svg cumulé.
      */
-    private function renderNodeWithConnections(PositionedTreeNode $node, string &$html, array &$connections, int $depth = 0): void
+    private function renderNodeWithConnections(PositionedTreeNode $node, string &$html, string &$svg): void
     {
-        $x = $node->bound->x;
-        $y = $node->bound->y;
-
-        $width = $node->bound->width;
-        $height = $node->bound->height;
-
         $html .= $this->renderNode($node);
 
+        foreach ($node->connections as $connection) {
+            $x1 = $connection->x1;
+            $y1 = $connection->y1;
+            $x2 = $connection->x2;
+            $y2 = $connection->y2;
+
+            if ($x1 == $x2 || $y1 == $y2) {
+                $svg .= "<line x1=\"$x1\" y1=\"$y1\" x2=\"$x2\" y2=\"$y2\" stroke=\"#555\" stroke-width=\"2\" />";
+            }else {
+                if ($this->layoutEngine->getOrientation() == TreeLayoutEngine::ORIENTATION_VERTICAL) {
+                    $curveOffset = 35; // vers la gauche pour l’effet de parenthèse
+                    $controlOffset = 20; // distance verticale entre point d'ancrage et point de contrôle
+
+                    $cx1 = $x1 + $curveOffset;
+                    $cx2 = $x2 - $curveOffset;
+
+                    if ($y1 < $y2) {
+                        $cy1 = $y1 + $controlOffset;
+                        $cy2 = $y2;
+                    } else {
+                        $cy1 = $y1 - $controlOffset;
+                        $cy2 = $y2 + $controlOffset;
+                    }
+                } else {
+                    $curveOffset = $this->calculateCurveOffset($node->depth);
+                    $cx1 = $x1;
+                    $cy1 = $y1 + $curveOffset;
+
+                    $cx2 = $x2;
+                    $cy2 = $y2 - $curveOffset;
+                }
+
+                $delay = 0.05 * $node->depth;
+                $svg .= "<path d=\"M$x1,$y1 C$cx1,$cy1 $cx2,$cy2 $x2,$y2\" stroke=\"#555\" stroke-width=\"2\" fill=\"none\" style=\"animation-delay: {$delay}s\" />";
+            }
+        }
+
         foreach ($node->children as $child) {
-            // Calculer les points de connexion (centre bas du parent → centre haut de l’enfant)
-            $x1 = $x + $width / 2;
-            $y1 = $y + $height;
-
-            $x2 = $child->bound->x + $width / 2;
-            $y2 = $child->bound->y;
-
-            $connections[] = [$x1, $y1, $x2, $y2, $depth];
-
-            $this->renderNodeWithConnections($child, $html, $connections, $depth + 1);
+            $this->renderNodeWithConnections($child, $html, $svg);
         }
     }
 

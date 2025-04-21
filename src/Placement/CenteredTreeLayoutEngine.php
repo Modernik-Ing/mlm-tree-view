@@ -2,6 +2,7 @@
 
 namespace Modernik\MlmTreeView\Placement;
 
+use InvalidArgumentException;
 use Modernik\MlmTreeView\TreeNode;
 
 /**
@@ -21,24 +22,61 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
         private int $nodeWidth = 120,
         private int $nodeHeight = 60,
         private int $spaceX = 60,
-        private int $spaceY = 100
+        private int $spaceY = 100,
+        private string $orientation = self::ORIENTATION_HORIZONTAL
     ) {
+        if (!in_array($this->orientation, [self::ORIENTATION_HORIZONTAL, self::ORIENTATION_VERTICAL])) {
+            throw new InvalidArgumentException("Unknown orientation : $this->orientation");
+        }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function layout (TreeNode $root): PositionedTreeNode
     {
         $measured = $this->measure($root);
-        $this->bound = new Bound(0, 0, $measured->width + ($this->spaceX * 2), $this->getTreeDepth($root) * ($this->nodeHeight + $this->spaceY));
+        $depth = $this->getTreeDepth($root);
+
+        if ($this->orientation === self::ORIENTATION_VERTICAL) {
+            $this->bound = new Bound(
+                0,
+                0,
+                $depth * ($this->spaceX + $this->nodeWidth),
+                $measured->height + ($this->spaceY * 2)
+            );
+
+            return $this->doLayout($measured, 0, 0);
+        }
+
+        $this->bound = new Bound(
+            0,
+            0,
+            $measured->width + ($this->spaceX * 2),
+            $depth * ($this->spaceY + $this->nodeHeight)
+        );
+
         return $this->doLayout($measured, 0, 0);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getBound(): Bound
     {
         return $this->bound;
     }
 
     /**
-     * Mesure récursivement la largeur de chaque sous-arbre.
+     * @inheritDoc
+     */
+    public function getOrientation(): string
+    {
+        return $this->orientation;
+    }
+
+    /**
+     * Mesure récursivement la taille de chaque sous-arbre.
      */
     private function measure(TreeNode $node): MeasuredNode
     {
@@ -49,18 +87,23 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
 
         if (empty($children)) {
             $measured->width = $this->nodeWidth;
+            $measured->height = $this->nodeHeight;
         } else {
             $totalWidth = 0;
+            $totalHeight = 0;
             $childNodes = [];
 
             foreach ($children as $child) {
                 $measuredChild = $this->measure($child);
                 $childNodes[] = $measuredChild;
                 $totalWidth += $measuredChild->width;
+                $totalHeight += $measuredChild->height;
             }
 
             $totalWidth += $this->spaceX * (count($childNodes) - 1);
+            $totalHeight += $this->spaceY * (count($childNodes) - 1);
             $measured->width = max($this->nodeWidth, $totalWidth);
+            $measured->height = max($this->nodeHeight, $totalHeight);
             $measured->children = $childNodes;
         }
 
@@ -70,13 +113,19 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
     /**
      * Positionne les nœuds selon les mesures préalables.
      */
-    private function doLayout(MeasuredNode $measuredNode, float $xOffset, int $depth): PositionedTreeNode
+    private function doLayout(MeasuredNode $measuredNode, float $offset, int $depth): PositionedTreeNode
     {
-        $x = $xOffset + ($measuredNode->width / 2);
-        $y = ($depth * ($this->nodeHeight + $this->spaceY)) + $this->spaceY / 2;
+        if ($this->orientation == self::ORIENTATION_VERTICAL) {
+            $x = ($depth * ($this->nodeWidth + $this->spaceX)) + ($this->spaceX / 2);
+            $y = $offset + ($measuredNode->height / 2);
+        } else {
+            $x = $offset + ($measuredNode->width / 2);
+            $y = ($depth * ($this->nodeHeight + $this->spaceY)) + $this->spaceY / 2;
+        }
 
         $positioned = new PositionedTreeNode();
         $positioned->node = $measuredNode->node;
+        $positioned->depth = $depth;
         $positioned->bound = new Bound(
             (int) $x,
             (int) $y,
@@ -84,11 +133,30 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
             $this->nodeHeight
         );
 
-        $childOffset = $xOffset;
+        $childOffset = $offset;
         foreach ($measuredNode->children as $childMeasured) {
             $child = $this->doLayout($childMeasured, $childOffset, $depth + 1);
+
+            if ($this->orientation === self::ORIENTATION_VERTICAL) {
+                $childOffset += $childMeasured->height + $this->spaceY;
+
+                $x1 = $positioned->bound->x + $positioned->bound->width;
+                $y1 = $positioned->bound->y + ($positioned->bound->height / 2);
+
+                $x2 = $child->bound->x;
+                $y2 = $child->bound->y + ($child->bound->height / 2);
+            } else {
+                $childOffset += $childMeasured->width + $this->spaceX;
+
+                $x1 = $positioned->bound->x + ($positioned->bound->width / 2);
+                $y1 = $positioned->bound->y + $positioned->bound->height;
+
+                $x2 = $child->bound->x + ($positioned->bound->width / 2);
+                $y2 = $child->bound->y;
+            }
+
             $positioned->children[] = $child;
-            $childOffset += $childMeasured->width + $this->spaceX;
+            $positioned->connections[] = new Line($x1, $y1, $x2, $y2);
         }
 
         return $positioned;

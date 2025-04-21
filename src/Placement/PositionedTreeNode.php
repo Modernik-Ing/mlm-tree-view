@@ -32,6 +32,18 @@ class PositionedTreeNode
     public ?Bound $bound = null;
 
     /**
+     * Lines de connection à un nœud.
+     * @var Line[]
+     */
+    public array $connections = [];
+
+    /**
+     * Profondeur de la position du noeud dans l'arbre.
+     * @var int
+     */
+    public int $depth = 0;
+
+    /**
      * Retourne les styles CSS nécessaires pour positionner le nœud dans une interface HTML.
      *
      * @return string Exemple : "left:100px;top:50px;width:120px;height:60px;"

@@ -13,6 +13,9 @@ use Modernik\MlmTreeView\TreeNode;
  */
 interface TreeLayoutEngine
 {
+    public const ORIENTATION_VERTICAL = "vertical";
+    public const ORIENTATION_HORIZONTAL = "horizontal";
+
     /**
      * Calcule et retourne un arbre positionné à partir d'un arbre logique.
      *
@@ -27,4 +30,10 @@ interface TreeLayoutEngine
      * @return Bound
      */
     public function getBound() : Bound;
+
+    /**
+     * Renvoie la configuration de l'orientation du layout.
+     * @return string
+     */
+    public function getOrientation() : string;
 }
