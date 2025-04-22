@@ -1,7 +1,7 @@
 <?php
 
-use Modernik\MlmTreeView\GenericTreeNode;
 use Modernik\MlmTreeView\Placement\CenteredTreeLayoutEngine;
+use Modernik\MlmTreeView\Placement\TreeLayoutEngine;
 use Modernik\MlmTreeView\Renderer\BasicHtmlTreeRenderer;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -10,11 +10,16 @@ include("fake-data.php");
 global $root;
 global $binary;
 global $ternary;
+global $notEquilibrateBinary;
 
 
 // Création du renderer
-$layout = new CenteredTreeLayoutEngine(70, 60, 50, 80);
-$renderer = new BasicHtmlTreeRenderer($layout, true);
+$layoutHorizontal = new CenteredTreeLayoutEngine(70, 60, 50, 80, TreeLayoutEngine::ORIENTATION_HORIZONTAL);
+$layoutVertical = new CenteredTreeLayoutEngine(70, 60, 90, 40, TreeLayoutEngine::ORIENTATION_VERTICAL);
+
+$rendererHorizontal = new BasicHtmlTreeRenderer($layoutHorizontal);
+$rendererVertical = new BasicHtmlTreeRenderer($layoutVertical);
+$notEquilibrateBinaryRender = new BasicHtmlTreeRenderer(new CenteredTreeLayoutEngine(200, 100, 50, 50));
 
 ?>
 <!DOCTYPE html>
@@ -34,14 +39,17 @@ $renderer = new BasicHtmlTreeRenderer($layout, true);
 </head>
 <body>
 
-<h1>Démo de l’Arbre MLM</h1>
-<?= $renderer->render($root) ?>
+<h1>Réseau binaire vertical</h1>
+<?= $rendererVertical->render($binary) ?>
 
-<h1>Réseau binaire</h1>
-<?= $renderer->render($binary) ?>
+<h1>Réseau binaire horizontal</h1>
+<?= $rendererHorizontal->render($binary) ?>
+
+<h1>Réseau binaire en déséquilibre</h1>
+<?= $notEquilibrateBinaryRender->render($notEquilibrateBinary) ?>
 
 <h1>Réseau ternaire</h1>
-<?= $renderer->render($ternary) ?>
+<?= $rendererVertical->render($ternary) ?>
 
 </body>
 </html>
