@@ -10,6 +10,7 @@ include("fake-data.php");
 global $root;
 global $binary;
 global $ternary;
+global $notEquilibrateBinary;
 
 
 // Création du renderer
@@ -18,6 +19,7 @@ $layoutVertical = new CenteredTreeLayoutEngine(70, 60, 90, 40, TreeLayoutEngine:
 
 $rendererHorizontal = new BasicHtmlTreeRenderer($layoutHorizontal);
 $rendererVertical = new BasicHtmlTreeRenderer($layoutVertical);
+$notEquilibrateBinaryRender = new BasicHtmlTreeRenderer(new CenteredTreeLayoutEngine(200, 100, 50, 50));
 
 ?>
 <!DOCTYPE html>
@@ -42,6 +44,9 @@ $rendererVertical = new BasicHtmlTreeRenderer($layoutVertical);
 
 <h1>Réseau binaire horizontal</h1>
 <?= $rendererHorizontal->render($binary) ?>
+
+<h1>Réseau binaire en déséquilibre</h1>
+<?= $notEquilibrateBinaryRender->render($notEquilibrateBinary) ?>
 
 <h1>Réseau ternaire</h1>
 <?= $rendererVertical->render($ternary) ?>

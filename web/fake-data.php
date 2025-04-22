@@ -66,6 +66,22 @@ $binary = new GenericTreeNode(1, 'ROOT', [
     ])
 ]);
 
+$notEquilibrateBinary = new GenericTreeNode(1, "MAMBULA LOKOLO", [
+    new GenericTreeNode(2, 'KISOKERO KIMA', [
+        new GenericTreeNode(3, 'FABIOLA KAOLI', [
+            new GenericTreeNode("A11", 'KITAMBALA SIMAKU'),
+            new GenericTreeNode("A12", 'SOMBOLA VASKO')
+        ]),
+        new GenericTreeNode(4, 'KASEREKA KIMBO', [
+            new GenericTreeNode("A211", 'SOMAKU DIMA'),
+            new GenericTreeNode("A212", 'PILITHO MARTALI')
+        ]),
+    ]),
+    new GenericTreeNode(5, 'BISIMAKO LOKITA', [
+        new GenericTreeNode(6, 'LIKAYA KARAMOKO'),
+    ])
+]);
+
 $ternary = new GenericTreeNode(1, 'ROOT', [
     new GenericTreeNode(2, 'A', [
         new GenericTreeNode(3, 'A1'),

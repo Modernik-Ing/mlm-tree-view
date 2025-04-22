@@ -42,7 +42,7 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
             $this->bound = new Bound(
                 0,
                 0,
-                $depth * ($this->spaceX + $this->nodeWidth),
+                ($depth * ($this->spaceX + $this->nodeWidth)) + $this->spaceX,
                 $measured->height + ($this->spaceY * 2)
             );
 
@@ -53,7 +53,7 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
             0,
             0,
             $measured->width + ($this->spaceX * 2),
-            $depth * ($this->spaceY + $this->nodeHeight)
+            ($depth * ($this->spaceY + $this->nodeHeight)) + $this->spaceY
         );
 
         return $this->doLayout($measured, 0, 0);
@@ -117,9 +117,9 @@ class CenteredTreeLayoutEngine implements TreeLayoutEngine
     {
         if ($this->orientation == self::ORIENTATION_VERTICAL) {
             $x = ($depth * ($this->nodeWidth + $this->spaceX)) + ($this->spaceX / 2);
-            $y = $offset + ($measuredNode->height / 2);
+            $y = $offset + ($measuredNode->height / 2) - ($this->nodeHeight / 2) + $this->spaceY;
         } else {
-            $x = $offset + ($measuredNode->width / 2);
+            $x = $offset + ($measuredNode->width / 2 ) - ($this->nodeWidth / 2) + $this->spaceX;
             $y = ($depth * ($this->nodeHeight + $this->spaceY)) + $this->spaceY / 2;
         }
 
